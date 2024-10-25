@@ -39,14 +39,14 @@ export default function SignUp() {
       navigate("/sign-in");
     } catch (err) {
       // console.log(err);
-      setError(err.message);
+      setError(err.response.data.message);
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen mt-20">
-      <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-6">
+      <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-10">
         {/* left */}
         <div className="flex-1">
           <Link to="/" className=" font-bold dark:text-white text-4xl">
@@ -55,10 +55,11 @@ export default function SignUp() {
             </span>
             Nest
           </Link>
-          <p className="text-sm mt-5 ">
+          <p className="text-sm mt-5 " style={{ textAlign: "justify" }}>
             BlogNest is a platform where users can easily create and publish
             blogs that are visible to everyone, enabling you to share your
-            stories, insights, and ideas with a global audience.
+            stories, insights, and ideas with a global audience. You can sign up
+            with your email and password or with Google.
           </p>
         </div>
         {/* right */}
