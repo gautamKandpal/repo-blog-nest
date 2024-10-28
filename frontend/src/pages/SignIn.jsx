@@ -2,13 +2,21 @@ import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../app/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(null);
+  // const [loading, setLoading] = useState(false);
+  const { loading, error } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     // console.log(e.target.value);
@@ -19,29 +27,34 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-      return setError("Please fill out all fields.");
+      return dispatch(signInFailure("Please fill out all fields"));
     }
     try {
-      setLoading(true);
-      setError(null);
+      dispatch(signInStart());
+      // setLoading(true);
+      // setError(null);
       const res = await axios.post(`${API_BASE_URL}/auth/sign-in`, formData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-      console.log(res);
-      // console.log(res.data);
+      // console.log(res);
       const data = res.data;
-      // console.log(data);
+
+      // If login is unsuccessful, trigger signInFailure
       if (data.success === false) {
-        return setError(data.message);
+        // return setError(data.message);
+        dispatch(signInFailure(data.message));
+        return; // exit the function to avoid setting success below
       }
-      setLoading(false);
+      // setLoading(false);
+      //***If the response status is 200 and login is successful***
+      dispatch(signInSuccess(data));
       navigate("/");
     } catch (err) {
-      // console.log(err);
-      setError(err.response.data.message || "Invalid cred!");
-      setLoading(false);
+      // setError(err.response.data.message || "Invalid cred!");
+      // setLoading(false);
+      dispatch(signInFailure(err.response?.data?.message));
     }
   };
 
