@@ -76,6 +76,28 @@ export const google = async (req, res, next) => {
           httpOnly: true,
         })
         .json(rest);
+      console.log("googleExistingSignin", rest);
+    } else {
+      const generatedPassword = Math.random().toString(36).slice(-8);
+      const hashPassword = bcryptjs.hashSync(generatedPassword, 10);
+
+      const newUser = new User({
+        username: name.toLowerCase().split(" ").join(""),
+        email,
+        password: hashPassword,
+        profilePicture: googlePhotoUrl,
+      });
+      await newUser.save();
+
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie("acess_token", token, {
+          httpOnly: true,
+        })
+        .json(rest);
+      console.log("googleNewSignin", rest);
     }
   } catch (error) {
     next(error);
