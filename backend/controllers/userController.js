@@ -3,7 +3,7 @@ import { errorHandler } from "../utils/error.js";
 import bcryptjs from "bcryptjs";
 
 export const updateUser = async (req, res, next) => {
-  //cookie.user.id !== params.userI
+  // if cookie.user.id !== params.userId
   // console.log(req.user);
   if (req.user.id !== req.params.userId) {
     return next(errorHandler(403, "You are not allowed to update this user"));

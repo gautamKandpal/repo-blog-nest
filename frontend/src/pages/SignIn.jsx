@@ -38,6 +38,7 @@ export default function SignIn() {
         headers: {
           "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
       // console.log(res);
       const data = res.data;

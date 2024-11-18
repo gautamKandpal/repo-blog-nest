@@ -53,7 +53,8 @@ export const signIn = async (req, res, next) => {
     res
       .status(200)
       .cookie("access_token", token, {
-        httpOnly: true,
+        // httpOnly: true,
+        httpOnly: false,
       })
       .json(rest);
   } catch (err) {
@@ -73,7 +74,8 @@ export const google = async (req, res, next) => {
       res
         .status(200)
         .cookie("access_token", token, {
-          httpOnly: true,
+          // httpOnly: true,
+          httpOnly: false,
         })
         .json(rest);
       console.log("googleExistingSignin", rest);
@@ -94,7 +96,8 @@ export const google = async (req, res, next) => {
       res
         .status(200)
         .cookie("access_token", token, {
-          httpOnly: true,
+          // httpOnly: true,
+          httpOnly: false,
         })
         .json(rest);
       console.log("googleNewSignin", rest);
