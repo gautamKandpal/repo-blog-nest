@@ -157,7 +157,9 @@ export default function DashProfile() {
             }`}
           />
         </div>
-        {imageFileUploadError && <Alert color="failure"> {} </Alert>}
+        {imageFileUploadError && (
+          <Alert color="failure"> {imageFileUploadError} </Alert>
+        )}
         <TextInput
           type="text"
           id="username"
