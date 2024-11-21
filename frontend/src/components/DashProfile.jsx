@@ -1,4 +1,4 @@
-import { Alert, Button, TextInput } from "flowbite-react";
+import { Alert, Button, Modal, ModalHeader, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -30,6 +30,7 @@ export default function DashProfile() {
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
   const [updateUserError, setUpdateUserError] = useState(null);
   // console.log(imageFileUploadProgress, imageFileUploadError);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({});
 
   const filePickerRef = useRef();
@@ -202,7 +203,9 @@ export default function DashProfile() {
         </Button>
       </form>
       <div className="text-red-500 flex justify-between mt-4">
-        <span className="cursor-pointer">Delete Account</span>
+        <span onClick={() => setShowModal(true)} className="cursor-pointer">
+          Delete Account
+        </span>
         <span className="cursor-pointer">Sign Out</span>
       </div>
       {updateUserSuccess && (
@@ -215,6 +218,15 @@ export default function DashProfile() {
           {updateUserError}
         </Alert>
       )}
+      {/* ****show the Modal for delete account*** */}
+      <Modal
+        show={showModal}
+        ocClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+      </Modal>
     </div>
   );
 }
