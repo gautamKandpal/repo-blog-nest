@@ -14,14 +14,18 @@ import {
   updateStart,
   updateSuccess,
   updateFailure,
+  deleteUserStart,
+  delteUserSuccess,
+  deleteUserFailure,
 } from "../app/user/userSlice";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function DashProfile() {
   const dispatch = useDispatch();
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, error } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -127,6 +131,27 @@ export default function DashProfile() {
       dispatch(updateFailure(error.response?.data?.message));
     }
   };
+  const handleDeleteUser = async () => {
+    setShowModal(false);
+    try {
+      dispatch(deleteUserStart());
+      const res = await axios.delete(
+        `${API_BASE_URL}/user/delete/${currentUser._id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      const data = res.data;
+      if (res.status === 200) {
+        dispatch(delteUserSuccess(data));
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.response?.data?.message));
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full ">
@@ -218,14 +243,37 @@ export default function DashProfile() {
           {updateUserError}
         </Alert>
       )}
+      {error && (
+        <Alert color="failure" className="mt-5">
+          {error}
+        </Alert>
+      )}
+
       {/* ****show the Modal for delete account*** */}
       <Modal
         show={showModal}
-        ocClose={() => setShowModal(false)}
+        onClose={() => setShowModal(false)}
         popup
         size="md"
       >
         <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete the account?{" "}
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDeleteUser}>
+                Yes, I&apos;m sure
+              </Button>
+
+              <Button color="gray" onClick={() => setShowModal(false)}>
+                No,cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
       </Modal>
     </div>
   );
