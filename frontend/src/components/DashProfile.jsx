@@ -1,4 +1,4 @@
-import { Alert, Button, Modal, ModalHeader, TextInput } from "flowbite-react";
+import { Alert, Button, Modal, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -17,6 +17,7 @@ import {
   deleteUserStart,
   delteUserSuccess,
   deleteUserFailure,
+  signoutSuccess,
 } from "../app/user/userSlice";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import axios from "axios";
@@ -131,6 +132,7 @@ export default function DashProfile() {
       dispatch(updateFailure(error.response?.data?.message));
     }
   };
+
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
@@ -150,6 +152,20 @@ export default function DashProfile() {
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.response?.data?.message));
+    }
+  };
+
+  const handleSignout = async () => {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/user/signout`);
+
+      if (res.status !== 200) {
+        console.log(res.data.message);
+      } else {
+        dispatch(signoutSuccess());
+      }
+    } catch (error) {
+      console.log(error.response?.data?.message);
     }
   };
 
@@ -231,7 +247,9 @@ export default function DashProfile() {
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
           Delete Account
         </span>
-        <span className="cursor-pointer">Sign Out</span>
+        <span onClick={handleSignout} className="cursor-pointer">
+          Sign Out
+        </span>
       </div>
       {updateUserSuccess && (
         <Alert color="success" className="mt-5">
