@@ -22,11 +22,12 @@ import {
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function DashProfile() {
   const dispatch = useDispatch();
-  const { currentUser, error } = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -72,7 +73,8 @@ export default function DashProfile() {
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setImageFileUploadProgress(progress.toFixed(0));
       },
-      (error) => {
+      // (error) => {
+      () => {
         setImageFileUploadError(
           "Could not upload image (File must be less than 2MB)"
         );
@@ -239,9 +241,26 @@ export default function DashProfile() {
           onChange={handleChange}
         />
 
-        <Button type="submit" gradientDuoTone="purpleToPink" outline>
-          Update
+        <Button
+          type="submit"
+          gradientDuoTone="purpleToPink"
+          outline
+          disabled={loading || imageFileUploading}
+        >
+          {loading ? "Loading..." : "Update"}
         </Button>
+        {currentUser.isAdmin && (
+          // link to create-post page if the current user is admin
+          <Link to={"/create-post"}>
+            <Button
+              type="button"
+              gradientDuoTone="purpleToPink"
+              className="w-full"
+            >
+              Create a post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className="text-red-500 flex justify-between mt-4">
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
