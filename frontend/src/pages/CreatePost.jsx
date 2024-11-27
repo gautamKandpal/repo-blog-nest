@@ -10,13 +10,18 @@ import {
 } from "firebase/storage";
 import { app } from "../../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
+import axios from "axios";
 import "react-circular-progressbar/dist/styles.css";
+import { useNavigate } from "react-router-dom";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function CreatePost() {
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
+  const [publishError, setPublishError] = useState(null);
   // console.log(formData);
   const handleUploadImage = async () => {
     try {
@@ -55,11 +60,37 @@ export default function CreatePost() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${API_BASE_URL}/post/create`, formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      const data = res.data;
+      console.log(data);
+      if (res.status == 200 && data.slug) {
+        setPublishError(null);
+      }
+      // navigate(`/post/${data.slug}`);
+    } catch (error) {
+      setPublishError(
+        error.response?.data?.message ||
+          "Something went wrong or Duplicate title"
+      );
+    } finally {
+      //Automatically clear the error after 3 sec
+      setTimeout(() => setPublishError(null), 3000);
+    }
+  };
+
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
       <h1 className="text-center text-3xl my-7 font-semibold">Create a post</h1>
 
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
           <TextInput
             type="text"
@@ -67,8 +98,15 @@ export default function CreatePost() {
             required
             id="title"
             className="flex-1"
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
           />
-          <Select>
+          <Select
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+          >
             <option value="uncategorized">Select a category</option>
             <option value="javascript"> Javascript</option>
             <option value="reactjs"> React.js</option>
@@ -115,10 +153,19 @@ export default function CreatePost() {
           placeholder="Write something..."
           className="h-72 mb-12"
           required
+          onChange={(value) => {
+            setFormData({ ...formData, content: value });
+          }}
         />
         <Button type="submit" gradientDuoTone="purpleToPink">
           Publish
         </Button>
+
+        {publishError && (
+          <Alert className="mt-5" color="failure">
+            {publishError}
+          </Alert>
+        )}
       </form>
     </div>
   );
